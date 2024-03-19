@@ -65,91 +65,171 @@ class GS_Algorithm {
         GS_Algorithm() {
             cout << "Enter number of people in each set (n): ";
             cin >> number_of_people_each_set;
-            cout << endl;
+            cout << "\n" << endl;
 
-            ifstream myfile ("boys.txt");
-            string boy_name;
-
-            if (myfile.is_open())
+            for (int i = 0; i < number_of_people_each_set; i++)
             {
-                while (getline(myfile, boy_name))
-                    {
-                        Person* person_pointer = new Person(boy_name);
-                        boys.push_back(person_pointer);
-                    }
-
-                myfile.close();
-            }     
-
-            ifstream myfile2 ("girls.txt");
-            string girl_name;
-
-            if (myfile2.is_open())
-            {
-                while (getline(myfile2, girl_name))
-                    {
-                        Person* person_pointer = new Person(girl_name);
-                        girls.push_back(person_pointer);
-                    }
-
-                myfile2.close();
+                string boy_name;
+                cout << "Enter the name of boy no." << i + 1 << ": ";
+                cin >> boy_name;
+                Person* person_pointer = new Person(boy_name);
+                boys.push_back(person_pointer);
+                cout << endl;
             }
 
-            ifstream myfile3 ("boysP.txt");
-            string boys_;
+            cout << "\n" << endl;
 
-            if (myfile3.is_open())
+            for (int i = 0; i < number_of_people_each_set; i++)
             {
-                int index = 0;
+                string girl_name;
+                cout << "Enter the name of girl no." << i + 1 << ": ";
+                cin >> girl_name;
+                Person* person_pointer = new Person(girl_name);
+                girls.push_back(person_pointer);
+                cout << endl;
+            }  
 
-                while (getline(myfile3, boys_))
+            cout << "\n" << endl;
+
+            for (int i = 0; i < number_of_people_each_set; i++)
+            {
+                string boy_name = boys.at(i)->getName();
+                cout << "Enter the preferences of " << boy_name << " in order (separated by space): ";
+                vector<Person> boy_preference;
+
+                for (int j = 0; j < number_of_people_each_set; j++)
+                {
+                    string preference;
+                    cin >> preference;
+                    Person person = Person(preference);
+
+                    if(indexOfPerson(girls, &person) == -1)
                     {
-                        vector<string> preferences;
-                        vector<Person> preferences_;
-
-                        boost::split(preferences, boys_, boost::is_any_of(" "), boost::token_compress_on);  
-
-                        for (int i = 0; i < number_of_people_each_set; i++)
-                        {
-                            Person person = Person(preferences.at(i));
-                            preferences_.push_back(person);
-                        }
-
-                        boys_preferences.push_back(preferences_);
-
-                        index++;
+                        cout << "Person " << preference << " is not in the entered list of girls.. Please enter a valid name.";
+                        throw exception();
                     }
 
-                myfile3.close();               
-            }
+                    boy_preference.push_back(person);
+                }
 
-            ifstream myfile4 ("girlsP.txt");
-            string girls_;
+                cout << endl;
 
-            if (myfile4.is_open())
+                boys_preferences.push_back(boy_preference);
+
+            } 
+
+            cout << "\n" << endl;  
+
+            for (int i = 0; i < number_of_people_each_set; i++)
             {
-                int index = 0;
+                string girl_name = girls.at(i)->getName();
+                cout << "Enter the preferences of " << girl_name << " in order (separated by space): ";
+                vector<Person> girl_preference;
 
-                while (getline(myfile4, girls_))
+                for (int j = 0; j < number_of_people_each_set; j++)
+                {
+                    string preference;
+                    cin >> preference;
+                    Person person = Person(preference);
+
+                    if(indexOfPerson(boys, &person) == -1)
                     {
-                        vector<string> preferences;
-                        vector<Person> preferences_;
-
-                        boost::split(preferences, girls_, boost::is_any_of(" "), boost::token_compress_on);  
-
-                        for (int i = 0; i < number_of_people_each_set; i++)
-                        {
-                            Person person = Person(preferences.at(i));
-                            preferences_.push_back(person);
-                        }
-
-                        girls_preferences.push_back(preferences_);
-
-                        index++;
+                        cout << "Person " << preference << " is not in the entered list of boys. Please enter a valid name.";
+                        throw exception();
                     }
 
-                myfile3.close();               
-            }
+                    girl_preference.push_back(person);
+                }
+
+                cout << endl;
+
+                girls_preferences.push_back(girl_preference);
+
+            }              
+
+            // ifstream myfile ("boys.txt");
+            // string boy_name;
+
+            // if (myfile.is_open())
+            // {
+            //     while (getline(myfile, boy_name))
+            //         {
+            //             Person* person_pointer = new Person(boy_name);
+            //             boys.push_back(person_pointer);
+            //         }
+
+            //     myfile.close();
+            // }     
+
+            // ifstream myfile2 ("girls.txt");
+            // string girl_name;
+
+            // if (myfile2.is_open())
+            // {
+            //     while (getline(myfile2, girl_name))
+            //         {
+            //             Person* person_pointer = new Person(girl_name);
+            //             girls.push_back(person_pointer);
+            //         }
+
+            //     myfile2.close();
+            // }
+
+            // ifstream myfile3 ("boysP.txt");
+            // string boys_;
+
+            // if (myfile3.is_open())
+            // {
+            //     int index = 0;
+
+            //     while (getline(myfile3, boys_))
+            //         {
+            //             vector<string> preferences;
+            //             vector<Person> preferences_;
+
+            //             boost::split(preferences, boys_, boost::is_any_of(" "), boost::token_compress_on);  
+
+            //             for (int i = 0; i < number_of_people_each_set; i++)
+            //             {
+            //                 Person person = Person(preferences.at(i));
+            //                 preferences_.push_back(person);
+            //             }
+
+            //             boys_preferences.push_back(preferences_);
+
+            //             index++;
+            //         }
+
+            //     myfile3.close();               
+            // }
+
+            // ifstream myfile4 ("girlsP.txt");
+            // string girls_;
+
+            // if (myfile4.is_open())
+            // {
+            //     int index = 0;
+
+            //     while (getline(myfile4, girls_))
+            //         {
+            //             vector<string> preferences;
+            //             vector<Person> preferences_;
+
+            //             boost::split(preferences, girls_, boost::is_any_of(" "), boost::token_compress_on);  
+
+            //             for (int i = 0; i < number_of_people_each_set; i++)
+            //             {
+            //                 Person person = Person(preferences.at(i));
+            //                 preferences_.push_back(person);
+            //             }
+
+            //             girls_preferences.push_back(preferences_);
+
+            //             index++;
+            //         }
+
+            //     myfile3.close();               
+            // }
         }
 
         // Helper function to check if there are any free boys every loop
