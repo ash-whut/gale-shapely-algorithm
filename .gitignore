@@ -1,4 +1,5 @@
 ## VS CODE files
-.vscode
+./.vscode
 
-a.out
+## out file
+./a.out

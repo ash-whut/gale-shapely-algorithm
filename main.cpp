@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <iomanip>
 #include <boost/algorithm/string/classification.hpp> // Include boost::for is_any_of
 #include <boost/algorithm/string/split.hpp> // Include for boost::split
 
@@ -39,10 +40,15 @@ class Person {
 
         void setPartner(Person* partner) {
             Person* temp_partner = this->partner;
-            temp_partner->partner = NULL;
-            temp_partner->matched = false;
+
+            if (temp_partner != NULL)
+            {
+                temp_partner->partner = NULL;
+                temp_partner->matched = false;
+            }
 
             this->partner = partner;
+            this->matched = true;
         }
 };
 
@@ -139,9 +145,7 @@ class GS_Algorithm {
 
                         girls_preferences.push_back(preferences_);
 
-                        index++;                        
-
-                        girls_preferences.push_back(preferences_);
+                        index++;
                     }
 
                 myfile3.close();               
@@ -165,7 +169,46 @@ class GS_Algorithm {
             return returned_vector;
         }
 
-        void CreatePairs()
+        int indexOfPerson(vector<Person*> people, Person* person)
+        {
+            for (int i = 0; i < people.size(); i++)
+            {
+                if (people.at(i)->getName() == person->getName())
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        int indexOfPerson(vector<Person> people, Person* person)
+        {
+            for (int i = 0; i < people.size(); i++)
+            {
+                if (people.at(i).getName() == person->getName())
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        int indexOfPerson(vector<Person> people, Person person)
+        {
+            for (int i = 0; i < people.size(); i++)
+            {
+                if (people.at(i).getName() == person.getName())
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        void createPairs()
         {
             vector<Person*> freeBoys = this->freeBoys();
 
@@ -176,25 +219,72 @@ class GS_Algorithm {
                 for (int i = 0; i < freeBoys.size(); i++)
                 {
                     Person* freeBoy = freeBoys.at(i);
+                    int index = indexOfPerson(boys, freeBoy);
+                    vector<Person> preferences = boys_preferences.at(index);
 
+                    for (int j = 0; j < preferences.size(); j++)
+                    {
+                        Person girl = preferences.at(j);
+                        int girl_index = indexOfPerson(girls, &girl);
+                        vector<Person> girl_preferences = girls_preferences.at(girl_index);
+                        Person* girl_from_girls_list = girls.at(girl_index);
+
+                        if (girl_from_girls_list->isMatched())
+                        {
+                            Person* girl_current_partner = girl_from_girls_list->getPartner();
+                            int current_partner_index = indexOfPerson(girl_preferences, *girl_current_partner);
+                            int new_partner_index = indexOfPerson(girl_preferences, *freeBoy);
+
+                            if (new_partner_index < current_partner_index)
+                            {
+                                girl_from_girls_list->setPartner(freeBoy);
+                                freeBoy->setPartner(girl_from_girls_list);
+                                break;
+                            }
+
+                        }
+
+                        else
+                        {
+                            freeBoy->setPartner(girls.at(girl_index));
+                            girls.at(girl_index)->setPartner(freeBoy);
+                            break;
+                        }
+
+                    }
                 }
+
+                freeBoys = this->freeBoys();
+
             }
 
+        }
+
+        void parsePairs()
+        {
+            for (int i = 0; i < boys.size(); i++)
+            {
+                vector<Person*> pair;
+                pair.push_back(boys.at(i));
+                pair.push_back(boys.at(i)->getPartner());
+
+                final_pairs.push_back(pair);
+            }
         }
 
         void printPairs() {
             cout << "Final Pairs:\n" << endl;
             for (int i = 0; i < final_pairs.size(); i++) {
-                cout << final_pairs[i][0]->getName() << " - " << final_pairs[i][1]->getName() << endl;
+                cout << "(" << final_pairs[i][0]->getName() << ", " << final_pairs[i][1]->getName() << ")" << endl;
             }
         }
 
         void printBoysPreferences() {
             cout << "Boys Preferences:\n" << endl;
             for (int i = 0; i < boys_preferences.size(); i++) {
-                cout << boys.at(i)->getName() << ": ";
+                cout << setw(10) << left << boys.at(i)->getName() << ": ";
                 for (int j = 0; j < boys_preferences[i].size(); j++) {
-                    cout << boys_preferences[i][j].getName() << " ";
+                    cout << setw(10) << left << boys_preferences[i][j].getName();
                 }
                 cout << endl;
             }
@@ -203,9 +293,9 @@ class GS_Algorithm {
         void printGirlsPreferences() {
             cout << "Girls Preferences:\n" << endl;
             for (int i = 0; i < girls_preferences.size(); i++) {
-                cout << girls.at(i)->getName() << ": ";
+                cout << setw(10) << left << girls.at(i)->getName() << ": ";
                 for (int j = 0; j < girls_preferences[i].size(); j++) {
-                    cout << girls_preferences[i][j].getName() << " ";
+                    cout << setw(10) << left << girls_preferences[i][j].getName();
                 }
                 cout << endl;
             }
@@ -221,5 +311,7 @@ int main() {
     gs.printGirlsPreferences();
     cout << "\n" << endl;
     gs.createPairs();
+    gs.parsePairs();
+    gs.printPairs();
     return 0;
 }
